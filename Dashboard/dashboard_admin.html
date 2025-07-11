@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="../assets/img/logo.png" alt="Company Logo" class="logo">
+            <h1>Admin Dashboard</h1>
+            <nav class="user-nav">
+                <span id="welcome-message"></span>
+                <button id="logout-button">Logout</button>
+            </nav>
+        </header>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="dashboard_admin.html">Dashboard</a></li>
+                
+                <li><a href="products.html" id="nav-products">Manage Products</a></li>
+                <li><a href="warehouses.html" id="nav-warehouses">Manage Warehouses</a></li>
+                <li><a href="import_bills.html" id="nav-import-bills">Manage Import Bills</a></li>
+                <li><a href="export_bills.html" id="nav-export-bills">Manage Export Bills</a></li>
+                <li><a href="customers.html" id="nav-customers">Manage Customers</a></li>
+                <li><a href="users.html" id="nav-users">Manage Users (Admin Only)</a></li>
+            </ul>
+        </nav>
+        <main>
+            <h2>Welcome to the Admin Dashboard!</h2>
+            <p>This is where you can manage various aspects of the system.</p>
+            
+            <section>
+                <h3>Quick Actions</h3>
+                <button id="create-product-btn">Create New Product</button>
+                <button id="create-warehouse-btn">Create New Warehouse</button>
+                <button id="create-import-bill-btn">Create New Import Bill</button>
+                <button id="create-export-bill-btn">Create New Export Bill</button>
+            </section>
+
+        </main>
+        <footer>
+            <p>&copy; 2023 Product Management System</p>
+        </footer>
+    </div>
+
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/dashboard_admin.js"></script>
+</body>
+</html>

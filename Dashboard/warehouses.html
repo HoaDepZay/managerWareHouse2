@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouses</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* CSS cho modal (đã được thêm vào các file HTML trước đó, đảm bảo nó có trong style.css hoặc đây) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto; /* Căn giữa modal */
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px; /* Giới hạn chiều rộng */
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            border-radius: 8px;
+            position: relative; /* Quan trọng cho nút đóng */
+            max-height: 90vh; /* Giới hạn chiều cao */
+            overflow-y: auto; /* Cuộn nếu nội dung dài */
+        }
+
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Styling cho danh sách sản phẩm trong modal */
+        .warehouse-product-list {
+            list-style: none;
+            padding: 0;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+            padding-top: 15px;
+        }
+
+        .warehouse-product-item {
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .warehouse-product-item strong {
+            color: #007bff;
+        }
+
+        /* Ẩn form thêm kho mới mặc định */
+        #add-warehouse-form-modal {
+            display: none;
+        }
+        /* Styles cho phần biểu đồ */
+        .chart-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .chart-controls label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .chart-controls select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* Thanh tìm kiếm trong modal */
+        .modal-search-bar {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .modal-search-bar input {
+            flex-grow: 1;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .modal-search-bar button {
+            padding: 8px 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="../assets/img/logo.png" alt="Company Logo" class="logo">
+            <h1>Warehouses</h1>
+            <nav class="user-nav">
+                <span id="welcome-message"></span>
+                <button id="logout-button">Logout</button>
+            </nav>
+        </header>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="dashboard_admin.html" id="admin-dashboard-link" style="display:none;">Admin Dashboard</a></li>
+                <li><a href="dashboard_staff.html" id="staff-dashboard-link" style="display:none;">Staff Dashboard</a></li>
+            </ul>
+        </nav>
+        <main>
+            <h2>Warehouse List</h2>
+            
+            <div id="add-warehouse-button-container" style="margin-bottom: 20px;">
+                <button id="open-add-warehouse-modal" style="display:none;">Thêm kho mới</button>
+            </div>
+            
+            <table id="warehouses-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Manager</th>
+                        <th>Number of Products</th>
+                        <th>Note</th>
+                        <th>Actions</th> </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+            <p id="warehouse-message"></p>
+
+            <section class="chart-section">
+                <h2>Phân tích Sản phẩm trong kho (Tổng hợp)</h2>
+                <div class="chart-controls">
+                    <label for="warehouse-product-chart-type">Hiển thị theo:</label>
+                    <select id="warehouse-product-chart-type">
+                        <option value="quantity">Số lượng</option>
+                        <option value="value">Giá trị (Số lượng x Giá bán)</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="warehouseProductChart"></canvas>
+                </div>
+                <p id="warehouse-chart-status" style="text-align: center; color: #666;"></p>
+            </section>
+
+        </main>
+        <footer>
+            <p>&copy; 2023 Product Management System</p>
+        </footer>
+    </div>
+
+    <div id="view-warehouse-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Chi tiết Kho: <span id="warehouse-detail-name"></span></h2>
+            <p><strong>Địa điểm:</strong> <span id="warehouse-detail-location"></span></p>
+            <p><strong>Người quản lý:</strong> <span id="warehouse-detail-manager"></span></p>
+            <p><strong>Ghi chú:</strong> <span id="warehouse-detail-note"></span></p>
+            
+            <h3>Danh sách sản phẩm trong kho:</h3>
+            <div class="modal-search-bar">
+                <input type="text" id="modal-product-search-input" placeholder="Tìm kiếm sản phẩm trong kho...">
+                <button id="modal-product-search-button">Tìm</button>
+            </div>
+            <ul id="warehouse-detail-products" class="warehouse-product-list">
+                </ul>
+            <p id="no-products-message" style="display:none; color: #666;">Kho này hiện không có sản phẩm nào.</p>
+        </div>
+    </div>
+
+    <div id="add-warehouse-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Thêm Kho Mới</h2>
+            <form id="add-warehouse-form-modal">
+                <label for="warehouse-name">Tên kho:</label>
+                <input type="text" id="add-warehouse-name" required>
+                <label for="warehouse-location">Địa điểm:</label>
+                <input type="text" id="add-warehouse-location" required>
+                <label for="warehouse-manager-id">Người quản lý (User ID, tùy chọn):</label>
+                <input type="text" id="add-warehouse-manager-id" placeholder="ID của người dùng quản lý">
+                <label for="warehouse-note">Ghi chú:</label>
+                <textarea id="add-warehouse-note"></textarea>
+                <button type="submit">Thêm Kho</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/warehouses.js"></script>
+</body>
+</html>

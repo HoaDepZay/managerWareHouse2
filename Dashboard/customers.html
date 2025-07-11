@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="../assets/img/logo.png" alt="Company Logo" class="logo">
+            <h1>Customer Management</h1>
+            <nav class="user-nav">
+                <span id="welcome-message"></span>
+                <button id="logout-button">Logout</button>
+            </nav>
+        </header>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="dashboard_admin.html" id="admin-dashboard-link" style="display:none;">Admin Dashboard</a></li>
+                <li><a href="dashboard_staff.html" id="staff-dashboard-link" style="display:none;">Staff Dashboard</a></li>
+            </ul>
+        </nav>
+        <main>
+            <h2>Customer List</h2>
+            <p id="customer-access-message"></p>
+            <table id="customers-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Email</th>
+                        <th>Seri</th>
+                        <th>Order History Count</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+
+            <div id="customer-detail-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h2>Customer Order History</h2>
+                    <h3 id="customer-detail-name"></h3>
+                    <p><strong>Phone:</strong> <span id="customer-detail-phone"></span></p>
+                    <p><strong>Address:</strong> <span id="customer-detail-address"></span></p>
+                    <p><strong>Email:</strong> <span id="customer-detail-email"></span></p>
+                    <p><strong>Seri:</strong> <span id="customer-detail-seri"></span></p>
+                    <h4>Orders:</h4>
+                    <ul id="customer-order-list">
+                        </ul>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; 2023 Product Management System</p>
+        </footer>
+    </div>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Sửa đường dẫn redirect
+            checkAuthAndRedirect(['admin', 'staff'], '../index/login_register.html');
+            displayWelcomeMessage();
+            document.getElementById('logout-button').addEventListener('click', logout);
+
+            const currentUser = getUserFromToken();
+            const isAdmin = currentUser && currentUser.role === 'admin';
+            const canViewCustomers = isAdmin || (currentUser && currentUser.permissions.includes('viewCustomers'));
+
+            if (isAdmin) {
+                document.getElementById('admin-dashboard-link').style.display = 'block';
+            } else if (currentUser && currentUser.role === 'staff') {
+                document.getElementById('staff-dashboard-link').style.display = 'block';
+            }
+
+            const customersTableBody = document.querySelector('#customers-table tbody');
+            const customerAccessMessage = document.getElementById('customer-access-message');
+            const customerDetailModal = document.getElementById('customer-detail-modal');
+            const closeButton = document.querySelector('.close-button');
+            const customerDetailName = document.getElementById('customer-detail-name');
+            const customerDetailPhone = document.getElementById('customer-detail-phone');
+            const customerDetailAddress = document.getElementById('customer-detail-address');
+            const customerDetailEmail = document.getElementById('customer-detail-email');
+            const customerDetailSeri = document.getElementById('customer-detail-seri');
+            const customerOrderList = document.getElementById('customer-order-list');
+
+            if (!canViewCustomers) {
+                customerAccessMessage.textContent = 'You do not have permission to view customer information.';
+                return;
+            }
+
+            const renderCustomers = async () => {
+                customersTableBody.innerHTML = '';
+                try {
+                    const customers = await getAllCustomers();
+                    if (customers.length === 0) {
+                        customerAccessMessage.textContent = 'No customers found.';
+                        return;
+                    }
+
+                    customers.forEach(customer => {
+                        const row = customersTableBody.insertRow();
+                        row.insertCell().textContent = customer.name;
+                        row.insertCell().textContent = customer.phone;
+                        row.insertCell().textContent = customer.address || 'N/A';
+                        row.insertCell().textContent = customer.email || 'N/A';
+                        row.insertCell().textContent = customer.seri || 'N/A';
+                        row.insertCell().textContent = customer.orderHistory ? customer.orderHistory.length : 0;
+                        
+                        const detailsCell = row.insertCell();
+                        const viewDetailsBtn = document.createElement('button');
+                        viewDetailsBtn.textContent = 'View Orders';
+                        viewDetailsBtn.addEventListener('click', () => showCustomerDetails(customer));
+                        detailsCell.appendChild(viewDetailsBtn);
+                    });
+                } catch (error) {
+                    customerAccessMessage.textContent = `Error loading customers: ${error.message}`;
+                    console.error('Error loading customers:', error);
+                }
+            };
+
+            const showCustomerDetails = (customer) => {
+                customerDetailName.textContent = customer.name;
+                customerDetailPhone.textContent = customer.phone;
+                customerDetailAddress.textContent = customer.address || 'N/A';
+                customerDetailEmail.textContent = customer.email || 'N/A';
+                customerDetailSeri.textContent = customer.seri || 'N/A';
+                customerOrderList.innerHTML = '';
+
+                if (customer.orderHistory && customer.orderHistory.length > 0) {
+                    customer.orderHistory.forEach(order => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <strong>Bill Code:</strong> ${order.code} <br>
+                            <strong>Date:</strong> ${new Date(order.date).toLocaleDateString()} <br>
+                            <strong>Staff:</strong> ${order.staff ? order.staff.username : 'N/A'} <br>
+                            <strong>Products:</strong>
+                            <ul>
+                                ${order.products.map(p => `<li>${p.name} (Qty: ${p.quantity}, Price: $${p.price})</li>`).join('')}
+                            </ul>
+                            <strong>Note:</strong> ${order.note || 'N/A'}
+                            <hr>
+                        `;
+                        customerOrderList.appendChild(li);
+                    });
+                } else {
+                    customerOrderList.innerHTML = '<li>No order history found for this customer.</li>';
+                }
+                customerDetailModal.style.display = 'block';
+            };
+
+            closeButton.addEventListener('click', () => {
+                customerDetailModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === customerDetailModal) {
+                    customerDetailModal.style.display = 'none';
+                }
+            });
+
+            renderCustomers();
+        });
+    </script>
+</body>
+</html>

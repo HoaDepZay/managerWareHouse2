@@ -1,0 +1,280 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+header .logo {
+    max-width: 100px;
+    margin-bottom: 10px;
+}
+
+h1, h2, h3 {
+    color: #333;
+}
+
+.main-nav ul, .user-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.main-nav li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.main-nav a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.main-nav a:hover {
+    text-decoration: underline;
+}
+
+.user-nav {
+    text-align: right;
+    margin-top: -50px; /* Adjust as needed to position next to H1 */
+}
+
+.user-nav span {
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+button, input[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+button:hover, input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+form {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="number"],
+form textarea,
+form select {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.product-item, .export-product-entry {
+    border: 1px dashed #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #fafafa;
+}
+
+.product-item label, .export-product-entry label {
+    font-weight: normal;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.product-item input, .product-item textarea,
+.export-product-entry input, .export-product-entry select {
+    margin-bottom: 8px;
+}
+
+.remove-product-from-import, .remove-export-product {
+    background-color: #dc3545;
+    margin-top: 10px;
+    margin-left: 0;
+}
+
+.remove-product-from-import:hover, .remove-export-product:hover {
+    background-color: #c82333;
+}
+
+/* Modal styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    border-radius: 8px;
+    position: relative;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+/* --- Styles for Horizontal Navigation (e.g., dashboard_staff.html, dashboard_admin.html) --- */
+.main-nav ul {
+    display: flex; /* Sắp xếp các mục theo chiều ngang */
+    flex-wrap: wrap; /* Cho phép các mục xuống dòng nếu không đủ chỗ */
+    justify-content: flex-start; /* Canh trái các mục */
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    background-color: #007bff; /* Nền xanh cho thanh nav */
+    border-radius: 8px; /* Bo tròn góc */
+    overflow: hidden; /* Đảm bảo bo tròn không bị tràn */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Thêm bóng nhẹ */
+}
+
+.main-nav li {
+    margin: 0; /* Bỏ margin giữa các li */
+}
+
+.main-nav a {
+    display: block; /* Khiến toàn bộ khu vực link có thể click */
+    padding: 15px 20px;
+    text-decoration: none;
+    color: white; /* Chữ trắng */
+    font-weight: bold;
+    background-color: #007bff; /* Nền xanh */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Hiệu ứng chuyển màu và scale mượt mà */
+    border-right: 1px solid rgba(255, 255, 255, 0.2); /* Đường phân cách nhẹ */
+    white-space: nowrap; /* Ngăn chữ bị xuống dòng */
+}
+
+.main-nav li:last-child a {
+    border-right: none; /* Bỏ đường phân cách ở cuối */
+}
+
+.main-nav a:hover {
+    background-color: #0056b3; /* Nền xanh đậm hơn khi hover */
+    transform: translateY(-2px); /* Hiệu ứng nâng nhẹ khi hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Bóng rõ hơn khi hover */
+}
+
+.main-nav li.active a {
+    background-color: #0056b3; /* Màu cho mục đang hoạt động (tùy chọn) */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3); /* Bóng chìm vào */
+}
+
+/* --- Styles for Permission Status Message --- */
+#permission-status {
+    padding: 15px;
+    background-color: #e0f7fa; /* Nền xanh nhạt */
+    color: #007bff;
+    border: 1px solid #b2ebf2;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-size: 0.95em;
+}
+
+/* --- General Layout Adjustment --- */
+main {
+    padding-top: 30px; /* Thêm khoảng cách nếu nav quá gần content */
+}

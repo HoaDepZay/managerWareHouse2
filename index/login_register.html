@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="../assets/img/logo.png" alt="Company Logo" class="logo">
+            <h1>Login or Register</h1>
+        </header>
+        <main>
+            <div id="login-section">
+                <h2>Login</h2>
+                <form id="login-form">
+                    <label for="login-username">Username:</label>
+                    <input type="text" id="login-username" name="username" required>
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" name="password" required>
+                    <button type="submit">Login</button>
+                    <p><a href="#forgot-password-section" id="show-forgot-password">Forgot Password?</a></p>
+                </form>
+            </div>
+
+            <div id="register-section" style="display: none;">
+                <h2>Register</h2>
+                <form id="register-form">
+                    <label for="reg-name">Name (Username):</label>
+                    <input type="text" id="reg-name" name="name" required>
+                    <label for="reg-gmail">Email:</label>
+                    <input type="email" id="reg-gmail" name="gmail" required>
+                    <label for="reg-numberphone">Phone Number:</label>
+                    <input type="text" id="reg-numberphone" name="numberphone">
+                    <label for="reg-password">Password:</label>
+                    <input type="password" id="reg-password" name="password" required>
+                    <label for="reg-department">Department (for Staff):</label>
+                    <input type="text" id="reg-department" name="department">
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+
+            <div id="forgot-password-section" style="display: none;">
+                <h2>Forgot Password</h2>
+                <form id="forgot-password-form">
+                    <label for="forgot-email">Email:</label>
+                    <input type="email" id="forgot-email" name="email" required>
+                    <button type="submit">Send OTP</button>
+                </form>
+                <div id="reset-password-section" style="display: none;">
+                    <h3>Reset Password</h3>
+                    <form id="reset-password-form">
+                        <label for="reset-email">Email:</label>
+                        <input type="email" id="reset-email" name="email" readonly required>
+                        <label for="reset-otp">OTP:</label>
+                        <input type="text" id="reset-otp" name="otp" required>
+                        <label for="reset-new-password">New Password:</label>
+                        <input type="password" id="reset-new-password" name="newPassword" required>
+                        <button type="submit">Reset Password</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="otp-verify-section" style="display: none;">
+                <h2>Verify Registration</h2>
+                <form id="verify-otp-form">
+                    <label for="verify-gmail">Email:</label>
+                    <input type="email" id="verify-gmail" name="gmail" readonly required>
+                    <label for="verify-otp">OTP:</label>
+                    <input type="text" id="verify-otp" name="otp" required>
+                    <button type="submit">Verify & Complete Registration</button>
+                </form>
+            </div>
+            
+            <p>
+                <a href="#" id="show-login">Login</a> | 
+                <a href="#" id="show-register">Register</a>
+            </p>
+        </main>
+        <footer>
+            <p>&copy; 2023 Product Management System</p>
+        </footer>
+    </div>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginSection = document.getElementById('login-section');
+            const registerSection = document.getElementById('register-section');
+            const forgotPasswordSection = document.getElementById('forgot-password-section');
+            const resetPasswordSection = document.getElementById('reset-password-section');
+            const otpVerifySection = document.getElementById('otp-verify-section');
+            
+            const showLoginLink = document.getElementById('show-login');
+            const showRegisterLink = document.getElementById('show-register');
+            const showForgotPasswordLink = document.getElementById('show-forgot-password');
+
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const forgotPasswordForm = document.getElementById('forgot-password-form');
+            const resetPasswordForm = document.getElementById('reset-password-form');
+            const verifyOtpForm = document.getElementById('verify-otp-form');
+
+            const toggleSections = (showLogin, showRegister, showForgot, showReset, showOtpVerify) => {
+                loginSection.style.display = showLogin ? 'block' : 'none';
+                registerSection.style.display = showRegister ? 'block' : 'none';
+                forgotPasswordSection.style.display = showForgot ? 'block' : 'none';
+                resetPasswordSection.style.display = showReset ? 'block' : 'none';
+                otpVerifySection.style.display = showOtpVerify ? 'block' : 'none';
+            };
+
+            // Initial view
+            toggleSections(true, false, false, false, false);
+
+            showLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleSections(true, false, false, false, false);
+            });
+
+            showRegisterLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleSections(false, true, false, false, false);
+            });
+
+            showForgotPasswordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleSections(false, false, true, false, false);
+            });
+
+            // Handle login
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = loginForm['login-username'].value;
+                const password = loginForm['login-password'].value;
+                
+                try {
+                    const response = await loginUser(username, password);
+                    alert(response.message || 'Login successful!');
+                    // Redirect based on role
+                    const token = localStorage.getItem('token');
+                    if (token) {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        if (payload.role === 'admin') {
+                            // Sửa đường dẫn chuyển hướng cho Admin
+                            window.location.href = '../Dashboard/dashboard_admin.html';
+                        } else if (payload.role === 'staff') {
+                            // Sửa đường dẫn chuyển hướng cho Staff
+                            window.location.href = '../Dashboard/dashboard_staff.html';
+                        } else {
+                            // Sửa đường dẫn chuyển hướng cho các role khác (ví dụ: customer)
+                            window.location.href = '../Dashboard/products.html'; 
+                        }
+                    }
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+
+            // Handle registration
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = registerForm['reg-name'].value;
+                const gmail = registerForm['reg-gmail'].value;
+                const numberphone = registerForm['reg-numberphone'].value;
+                const password = registerForm['reg-password'].value;
+                const department = registerForm['reg-department'].value;
+
+                try {
+                    const response = await registerUser({ name, gmail, numberphone, password, department });
+                    alert(response.message);
+                    document.getElementById('verify-gmail').value = gmail;
+                    toggleSections(false, false, false, false, true); // Show OTP verification
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+
+            // Handle OTP verification for registration
+            verifyOtpForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const gmail = verifyOtpForm['verify-gmail'].value;
+                const otp = verifyOtpForm['verify-otp'].value;
+
+                try {
+                    const response = await verifyRegistrationOTP(gmail, otp);
+                    alert(response.message);
+                    toggleSections(true, false, false, false, false); // Back to login
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+
+            // Handle forgot password (send OTP)
+            forgotPasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = forgotPasswordForm['forgot-email'].value;
+                try {
+                    const response = await sendForgotPasswordOTP(email);
+                    alert(response.message);
+                    document.getElementById('reset-email').value = email;
+                    resetPasswordSection.style.display = 'block'; // Show reset password form
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+
+            // Handle reset password
+            resetPasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = resetPasswordForm['reset-email'].value;
+                const otp = resetPasswordForm['reset-otp'].value;
+                const newPassword = resetPasswordForm['reset-new-password'].value;
+
+                try {
+                    const response = await resetPassword(email, otp, newPassword);
+                    alert(response.message);
+                    toggleSections(true, false, false, false, false); // Back to login
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+
+            // Check URL hash for initial section display
+            if (window.location.hash === '#register') {
+                toggleSections(false, true, false, false, false);
+            } else if (window.location.hash === '#forgot-password') {
+                toggleSections(false, false, true, false, false);
+            }
+        });
+    </script>
+</body>
+</html>

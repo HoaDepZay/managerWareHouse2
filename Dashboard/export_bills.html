@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export Bills</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* CSS cho modal (đã được thêm vào các file HTML trước đó, đảm bảo nó có trong style.css hoặc đây) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto; /* Căn giữa modal */
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px; /* Giới hạn chiều rộng */
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            border-radius: 8px;
+            position: relative; /* Quan trọng cho nút đóng */
+            max-height: 90vh; /* Giới hạn chiều cao */
+            overflow-y: auto; /* Cuộn nếu nội dung dài */
+        }
+
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Styling cho phần sản phẩm trong form nhập và chi tiết hóa đơn */
+        .export-product-entry, .detail-product-item {
+            border: 1px dashed #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fafafa;
+        }
+
+        .export-product-entry label {
+            font-weight: normal;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .export-product-entry input, .export-product-entry select {
+            margin-bottom: 8px;
+        }
+
+        .remove-export-product {
+            background-color: #dc3545;
+            margin-top: 10px;
+            margin-left: 0;
+        }
+
+        .remove-export-product:hover {
+            background-color: #c82333;
+        }
+        
+        .modal-actions {
+            text-align: right;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .product-select-container {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+
+        /* Styles cho phần biểu đồ */
+        .chart-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap; /* Cho phép các điều khiển xuống dòng */
+        }
+
+        .chart-controls label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .chart-controls select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px; /* Chiều cao cố định cho biểu đồ */
+            width: 100%;
+            margin-bottom: 20px; /* Khoảng cách giữa các biểu đồ */
+        }
+
+        /* Styles for customer choice */
+        .customer-choice-options {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .customer-choice-options label {
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+        .customer-choice-options input[type="radio"] {
+            width: auto;
+            margin-right: 5px;
+            margin-bottom: 0;
+        }
+        .customer-form-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            margin-bottom: 15px;
+        }
+        .customer-form-section select,
+        .customer-form-section input[type="text"],
+        .customer-form-section input[type="email"] {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="../assets/img/logo.png" alt="Company Logo" class="logo">
+            <h1>Export Bills</h1>
+            <nav class="user-nav">
+                <span id="welcome-message"></span>
+                <button id="logout-button">Logout</button>
+            </nav>
+        </header>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="dashboard_admin.html" id="admin-dashboard-link" style="display:none;">Admin Dashboard</a></li>
+                <li><a href="dashboard_staff.html" id="staff-dashboard-link" style="display:none;">Staff Dashboard</a></li>
+            </ul>
+        </nav>
+        <main>
+            <h2>Export Bill List</h2>
+            
+            <div id="add-export-bill-button-container" style="margin-bottom: 20px;">
+                <button id="open-add-export-bill-modal" style="display:none;">Tạo hóa đơn xuất mới</button>
+            </div>
+
+            <table id="export-bills-table">
+                <thead>
+                    <tr>
+                        <th>Mã HĐ</th>
+                        <th>Ngày tạo</th>
+                        <th>Tên khách hàng</th>
+                        <th>Nhân viên</th>
+                        <th>SL sản phẩm</th>
+                        <th>Ghi chú</th>
+                        <th>Hành động</th> </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+            <p id="export-bill-message"></p>
+
+            <section class="chart-section">
+                <h2>Phân tích Xuất kho theo thời gian</h2>
+                <div class="chart-controls">
+                    <label for="chart-type-select">Loại biểu đồ:</label>
+                    <select id="chart-type-select">
+                        <option value="quantity">Số lượng sản phẩm xuất</option>
+                        <option value="revenue">Tổng doanh thu</option>
+                    </select>
+
+                    <label for="time-range-select">Phạm vi thời gian:</label>
+                    <select id="time-range-select">
+                        <option value="daily">Theo ngày</option>
+                        <option value="monthly">Theo tháng</option>
+                        <option value="yearly">Theo năm</option>
+                    </select>
+
+                    <label for="year-select">Chọn năm:</label>
+                    <select id="year-select"></select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="exportTimeChart"></canvas>
+                </div>
+                <p id="time-chart-status" style="text-align: center; color: #666;"></p>
+            </section>
+
+            <section class="chart-section">
+                <h2>Top Sản phẩm xuất</h2>
+                <div class="chart-controls">
+                    <label for="product-chart-display-type">Hiển thị theo:</label>
+                    <select id="product-chart-display-type">
+                        <option value="quantity">Số lượng xuất</option>
+                        <option value="revenue">Doanh thu</option>
+                    </select>
+
+                    <label for="product-chart-top-n">Hiển thị top:</label>
+                    <select id="product-chart-top-n">
+                        <option value="5">Top 5</option>
+                        <option value="10">Top 10</option>
+                        <option value="all">Tất cả</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="exportProductQuantityChart"></canvas>
+                </div>
+                <p id="product-chart-status" style="text-align: center; color: #666;"></p>
+            </section>
+
+        </main>
+        <footer>
+            <p>&copy; 2023 Product Management System</p>
+        </footer>
+    </div>
+
+    <div id="add-export-bill-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Tạo Hóa Đơn Xuất Mới</h2>
+            <form id="create-export-bill-form">
+                <h4>Thông tin Khách hàng:</h4>
+                <div class="customer-choice-options">
+                    <label><input type="radio" name="customer_selection_type" value="new_customer" checked> Khách hàng mới</label>
+                    <label><input type="radio" name="customer_selection_type" value="existing_customer"> Khách hàng có sẵn</label>
+                </div>
+
+                <div id="new-customer-fields" class="customer-form-section">
+                    <label for="customer-name">Tên khách hàng:</label>
+                    <input type="text" id="new-customer-name" required>
+                    <label for="customer-phone">Số điện thoại:</label>
+                    <input type="text" id="new-customer-phone" required>
+                    <label for="customer-address">Địa chỉ:</label>
+                    <input type="text" id="new-customer-address">
+                    <label for="customer-email">Email:</label>
+                    <input type="email" id="new-customer-email">
+                    <label for="customer-seri">Seri (Tùy chọn):</label>
+                    <input type="text" id="new-customer-seri">
+                </div>
+
+                <div id="existing-customer-fields" class="customer-form-section" style="display: none;">
+                    <label for="existing-customer-select">Chọn khách hàng có sẵn:</label>
+                    <select id="existing-customer-select" required>
+                        <option value="">-- Chọn Khách hàng --</option>
+                        </select>
+                    <p><strong>Tên:</strong> <span id="display-existing-customer-name"></span></p>
+                    <p><strong>SĐT:</strong> <span id="display-existing-customer-phone"></span></p>
+                    <p><strong>Địa chỉ:</strong> <span id="display-existing-customer-address"></span></p>
+                    <p><strong>Email:</strong> <span id="display-existing-customer-email"></span></p>
+                    <p><strong>Seri:</strong> <span id="display-existing-customer-seri"></span></p>
+                    </div>
+
+
+                <h4>Sản phẩm xuất:</h4>
+                <label for="export-warehouse-id">Chọn Kho:</label>
+                <select id="export-warehouse-id" required>
+                    </select>
+                <div id="export-products-container">
+                    <p class="product-select-container">Chọn một kho để xem sản phẩm có sẵn.</p>
+                </div>
+                <button type="button" id="add-product-to-export">Thêm Sản phẩm từ kho</button>
+                
+                <label for="export-note">Ghi chú:</label>
+                <textarea id="export-note"></textarea>
+                <button type="submit">Tạo Hóa Đơn Xuất</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="view-export-bill-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Chi tiết Hóa Đơn Xuất</h2>
+            <p><strong>Mã HĐ:</strong> <span id="bill-detail-code"></span></p>
+            <p><strong>Ngày tạo:</strong> <span id="bill-detail-date"></span></p>
+            <p><strong>Tên khách hàng:</strong> <span id="bill-detail-customer-name"></span></p>
+            <p><strong>SĐT khách hàng:</strong> <span id="bill-detail-customer-phone"></span></p>
+            <p><strong>Địa chỉ khách hàng:</strong> <span id="bill-detail-customer-address"></span></p>
+            <p><strong>Nhân viên:</strong> <span id="bill-detail-staff-name"></span></p>
+            <p><strong>Ghi chú:</strong> <span id="bill-detail-note"></span></p>
+            <h3>Sản phẩm trong hóa đơn:</h3>
+            <ul id="bill-detail-products-list">
+                </ul>
+            <p id="no-products-in-bill-message" style="display:none; color: #666;">Hóa đơn này không có sản phẩm nào.</p>
+            
+            <div class="modal-actions">
+                <button id="detail-edit-export-button" style="display:none;">Sửa Hóa Đơn</button>
+                <button id="detail-delete-export-button" style="display:none;">Xóa Hóa Đơn</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/export_bills.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* CSS tạm thời cho các nút chức năng để dễ hình dung, có thể chuyển vào style.css */
+        .main-nav ul {
+            display: flex; /* Sắp xếp các mục theo chiều ngang */
+            justify-content: flex-start; /* Canh trái các mục */
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            background-color: #007bff; /* Nền xanh cho thanh nav */
+            border-radius: 5px;
+            overflow: hidden; /* Đảm bảo bo tròn không bị tràn */
+        }
+
+        .main-nav li {
+            margin: 0; /* Bỏ margin giữa các li */
+        }
+
+        .main-nav a {
+            display: block; /* Khiến toàn bộ khu vực link có thể click */
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white; /* Chữ trắng */
+            font-weight: bold;
+            background-color: #007bff; /* Nền xanh */
+            transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu mượt mà */
+            border-right: 1px solid rgba(255, 255, 255, 0.2); /* Đường phân cách nhẹ */
+        }
+
+        .main-nav li:last-child a {
+            border-right: none; /* Bỏ đường phân cách ở cuối */
+        }
+
+        .main-nav a:hover {
+            background-color: #0056b3; /* Nền xanh đậm hơn khi hover */
+        }
+        
+        .main-nav li.active a {
+            background-color: #0056b3; /* Màu cho mục đang hoạt động (tùy chọn) */
+        }
+
+        /* Tùy chỉnh cho thông báo permissions */
+        #permission-status {
+            padding: 15px;
+            background-color: #e0f7fa; /* Nền xanh nhạt */
+            color: #007bff;
+            border: 1px solid #b2ebf2;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        /* Cải thiện bố cục chung nếu cần */
+        main {
+            padding-top: 20px; /* Thêm khoảng cách nếu nav quá gần content */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="../assets/img/logo.png" alt="Company Logo" class="logo">
+            <h1>Staff Dashboard</h1>
+            <nav class="user-nav">
+                <span id="welcome-message"></span>
+                <button id="logout-button">Logout</button>
+            </nav>
+        </header>
+        <nav class="main-nav">
+            <ul>
+                <li id="nav-products"><a href="products.html">View Products</a></li>
+                <li id="nav-warehouses"><a href="warehouses.html">View Warehouses</a></li>
+                <li id="nav-import-bills"><a href="import_bills.html">Manage Import Bills</a></li>
+                <li id="nav-export-bills"><a href="export_bills.html">Manage Export Bills</a></li>
+                <li id="nav-customers"><a href="customers.html">View Customers</a></li>
+            </ul>
+        </nav>
+        <main>
+            <h2>Welcome, Staff!</h2>
+            <p>Your available actions are listed in the navigation menu based on your assigned permissions.</p>
+            <p id="permission-status"></p>
+        </main>
+        <footer>
+            <p>&copy; 2023 Product Management System</p>
+        </footer>
+    </div>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/dashboard_staff.js"></script>
+</body>
+</html>
